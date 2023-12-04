@@ -1,6 +1,6 @@
 const fs = require('fs')
 
-function parse_line(line)
+function handle_line(line)
 {
 	let winning_nums;
 	let my_nums;
@@ -11,38 +11,23 @@ function parse_line(line)
 	winning_nums = splitted[0].substr(line.search(":") + 2).trim().split(spaces_regex)
 	my_nums = splitted[1].trim().split(spaces_regex)
 
-	winning_nums = winning_nums.map(element => {
+	winning_nums = new Set(winning_nums.map(element => {
 									return (parseInt(element))
-									})
+									}))
 
-	my_nums = my_nums.map(element => {
+	my_nums = new Set(my_nums.map(element => {
 						  return (parseInt(element))
-						  })
+						  }))
 
-	nums.push(winning_nums)
-	nums.push(my_nums)
-
-	return (nums)
-}
-
-// nums is the output from above
-function get_matches(nums)
-{
-	let matches = 0
-	let arr = new Array(100).fill(0)
-
-	for (let win of nums[0])
-	{
-		arr[win - 1] = 1
-	}
-	for (let my_num of nums[1])
-	{
-		if (arr[my_num - 1] === 1)
-			matches++
-	}
+	// to get the intersection of two sets
+	// ... (spread operator) expands the iterable into arguments (for functions) / elements (for arrays)
+	// arrow function WITH curly braces does not automatically return value
+	// arrow function WITHOUT curly braces implicitly returns a value
+	let matches = [...winning_nums].filter(element => my_nums.has(element)).length
 
 	return (matches)
 }
+
 
 let args = process.argv
 
@@ -68,19 +53,24 @@ const spaces_regex = /\s+/
 let total = 0
 
 let results = {}
-let scratchcards = {}
 
 for (let i = 0; i < lines.length; ++i)
 {
-	let nums = parse_line(lines[i])
-
-	results[i + 1] = get_matches(nums)
+	results[i + 1] = handle_line(lines[i])
 }
 
-for (let key in results)
-{
-	scratchcards[key] = 1
-}
+// surprise surprise
+// dicts are just objects (key value pairs are actually properties)
+// we build scratchcards with the same keys as results but initialise all values to 1
+// .reduce transforms (reduces) the array of keys into a singular object (scratchcards)
+// the initial value of scratchcards is provided ({})
+// in each execution of the reducer function per element in keys, a new property (key value pair) is added to the accumulator (the final result)
+// the return value of the reducer function is the input for the next reducer function call.
+// idk what i just wrote here but all you need to know is that reduce transforms an array of keys into an object with keys value pairs all initialised to 1
+let scratchcards = Object.keys(results).reduce((obj, key) => {
+												obj[key] = 1
+												return obj
+												}, {})
 
 for (let key in results)
 {
