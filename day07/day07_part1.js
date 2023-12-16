@@ -16,11 +16,12 @@ function parse_hands(data)
 }
 
 const hand_type = {
-	five_of_a_kind: 1,
-	four_of_a_kind: 2,
-	full_house: 3,
-	three_of_a_kind: 4,
-	pair: 5,
+	five_of_a_kind: 0,
+	four_of_a_kind: 1,
+	full_house: 2,
+	three_of_a_kind: 3,
+	two_pair: 4,
+	one_pair: 5,
 	high_card: 6
 }
 
@@ -31,33 +32,68 @@ function compare_cards(a, b)
 	return (strength.indexOf(a) - strength.indexOf(b))
 }
 
+function same_chars(arr, char)
+{
+	return (arr.filter((element) => element === char).length)
+}
+
 function get_hand_type(hand)
 {
+	// console.log(hand)
+
 	hand = hand.split('')
 
 	hand.sort(compare_cards)
 
-	console.log("Hand:", hand)
+	// console.log("Hand:", hand)
 
-	let same = hand.filter((element) => element === hand[0]).length
-
-	switch (same)
+	if (same_chars(hand, hand[2]) === 5) // five of a kind
+		return (hand_type.five_of_a_kind)
+	else if (same_chars(hand, hand[2]) === 4) // four of a kind
+		return (hand_type.four_of_a_kind)
+	else if (same_chars(hand, hand[2]) === 3)
 	{
-		case (hand.length):
-			return (hand_type.five_of_a_kind)
-		case (hand.length - 1):
-			return (hand_type.four_of_a_kind)
-		case (hand.length - 2):
-			if (hand.filter((element) => element === hand[3]).length === 2)
-				return (hand_type.full_house)
-			else
-				return (hand_type.three_of_a_kind)
+		if (same_chars(hand, hand[0]) === 2 || same_chars(hand, hand[5]) === 2) // full house
+			return (hand_type.full_house)
+		else
+			return (hand_type.three_of_a_kind)
 	}
+	else if ((same_chars(hand, hand[0]) === 2 && same_chars(hand, hand[2]) === 2) 
+				|| (same_chars(hand, hand[1]) === 2 && same_chars(hand, hand[3]) === 2)
+				|| (same_chars(hand, hand[0]) === 2 && same_chars(hand, hand[3]) === 2)
+			) // two pair AABBx xAABB AAxBB
+		return (hand_type.two_pair)
+	else if ((same_chars(hand, hand[0]) === 2) || (same_chars(hand, hand[1]) === 2)
+				|| (same_chars(hand, hand[2]) === 2) || (same_chars(hand, hand[3]) === 2)
+			) // pair AAxyz xAAyz xyAAz xyzAA 
+		return (hand_type.one_pair)
+	else
+		return (hand_type.high_card)
 }
 
 function compare_hands(a, b)
 {
-	// compares hands
+	let a_hand = get_hand_type(a[0])
+	let b_hand = get_hand_type(b[0])
+
+	// console.log(a_hand, b_hand)
+
+	if (a_hand < b_hand)
+		return (-1)
+	else if (b_hand < a_hand)
+		return (1)
+	else
+	{
+		for (let i = 0; i < a.length; i++)
+		{
+			let res = compare_cards(a[0][i], b[0][i])
+			if (res > 0)
+				return (-1)
+			else if (res < 0)
+				return (1)
+		}
+		return (0)
+	}
 }
 
 // main
@@ -80,8 +116,15 @@ catch (err)
 
 let hands = parse_hands(data)
 
-// hands.sort(compare_hands)
+hands.sort(compare_hands).reverse()
 
-// console.log(hands)
+console.log(JSON.stringify(hands, null, 2))
 
-console.log(get_hand_type('23332'))
+let winnings = 0
+
+for (let i = 0; i < hands.length; i++)
+	winnings += (hands[i][1]) * (i + 1)
+
+console.log("Winnings:", winnings)
+
+//console.log(compare_hands(["KK677", 0], ["KTJJT", 0]))
