@@ -64,6 +64,7 @@ function gcd(a, b)
 
 function arr_lcm(arr)
 {
+	// cant use this, overflow, calculate lcm by element instead
 	// let product = arr.reduce((prev, curr) => (prev * curr), arr[0])
 	// console.log(product)
 	// return (product / arr_gcd(arr))
@@ -72,8 +73,7 @@ function arr_lcm(arr)
 
 	for (let i = 1; i < arr.length; i++)
 	{
-		let gcd_val = gcd(lcm, arr[i])
-		lcm = lcm * arr[i] / gcd_val
+		lcm *= arr[i] / gcd(lcm, arr[i])
 	}
 	return (lcm);
 }
