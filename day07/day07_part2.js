@@ -25,7 +25,7 @@ const hand_type = {
 	high_card: 6
 }
 
-const strength = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
+const strength = ['J', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'Q', 'K', 'A']
 
 function compare_cards(a, b)
 {
@@ -45,16 +45,8 @@ function same_chars(arr, char)
 	return (arr.filter((element) => element === char).length)
 }
 
-function get_hand_type(hand)
+function get_hand_type_no_joker(hand)
 {
-	// console.log(hand)
-
-	hand = hand.split('')
-
-	hand.sort(compare_cards)
-
-	// console.log("Hand:", hand)
-
 	if (same_chars(hand, hand[2]) === 5) // five of a kind
 		return (hand_type.five_of_a_kind)
 	else if (same_chars(hand, hand[2]) === 4) // four of a kind
@@ -79,12 +71,56 @@ function get_hand_type(hand)
 		return (hand_type.high_card)
 }
 
+function get_hand_type(hand)
+{
+	// hand = hand.split('')
+
+	hand.sort(compare_cards)
+
+	// console.log("Hand:", hand)
+
+	let jokers = same_chars(hand, 'J')
+
+	switch (jokers)
+	{
+		case 5:
+		case 4: // A + JJJJ = five
+			return (hand_type.five_of_a_kind)
+		case 3:
+			if (same_chars(hand, hand[3]) === 2) // remaining pair AA + JJJ = five
+				return (hand_type.five_of_a_kind)
+			else // xA + JJJ = four
+				return (hand_type.four_of_a_kind)
+		case 2:
+			if (same_chars(hand, hand[2]) === 3) // remaining triple AAA + JJ = five
+				return (hand_type.five_of_a_kind)
+			else if (same_chars(hand, hand[3]) === 2) // remaining pair xAA AAx + JJ = four
+				return (hand_type.four_of_a_kind)
+			else // xxA + JJ = triple
+				return (hand_type.three_of_a_kind)
+		case 1:
+			if (same_chars(hand, hand[1]) === 4) // AAAA + J = five
+				return (hand_type.five_of_a_kind) 
+			else if (same_chars(hand, hand[2]) === 3) // xAAA AAAx + J = four
+				return (hand_type.four_of_a_kind)
+			else if (same_chars(hand, hand[1]) === 2 && same_chars(hand, hand[3]) === 2) // AABB + J = full
+				return (hand_type.full_house)
+			else if (same_chars(hand, hand[1]) === 2 || same_chars(hand, hand[3]) === 2) // AAxx xAAx xxAA + J = three
+				return (hand_type.three_of_a_kind)
+			else // A + J = pair
+				return (hand_type.one_pair)
+		case 0:
+			return (get_hand_type_no_joker(hand))
+	}
+
+}
+
 function compare_hands(a, b)
 {
 	let a_hand = get_hand_type(a[0])
 	let b_hand = get_hand_type(b[0])
 
-	// console.log(a_hand, b_hand)
+	console.log(a_hand, b_hand)
 
 	if (a_hand < b_hand)
 		return (-1)
