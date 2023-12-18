@@ -49,18 +49,14 @@ function calc_distance(a, b, empty)
 	let empty_rows = 0
 	let empty_cols = 0
 
-	let smaller
-	let bigger
+	let smaller = a[0]
+	let bigger = b[0]
 
+	// this code is shit
 	if (a[0] > b[0]) // row
 	{
 		smaller = b[0]
 		bigger = a[0]
-	}
-	else
-	{
-		smaller = a[0]
-		bigger = b[0]
 	}
 
 	for (let empty_row of empty[0])
@@ -69,15 +65,13 @@ function calc_distance(a, b, empty)
 			empty_rows++
 	}
 
+	smaller = a[1]
+	bigger = b[1]
+
 	if (a[1] > b[1]) // col
 	{
 		smaller = b[1]
 		bigger = a[1]
-	}
-	else
-	{
-		smaller = a[1]
-		bigger = b[1]
 	}
 
 	for (let empty_col of empty[1])
