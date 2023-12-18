@@ -105,12 +105,13 @@ function find_loop(pipes)
 	return (pipe_loop_coords)
 }
 
+
 function find_area(points)
 {
 	let p = [...points, points[0]]
 	let area = 0
 
-	for (let i = 0; i < p.length - 1; i++)
+	for (let i = 0; i < p.length - 1; i++) // shoelace formula
 	{
 		area += ((p[i][0] * p[i + 1][1]) - (p[i][1] * p[i + 1][0]))
 	}
@@ -121,7 +122,7 @@ function find_area(points)
 
 function find_interior(area, points)
 {
-	return (area - (points.length / 2) + 1)
+	return (area - (points.length / 2) + 1) // pick's theorem
 }
 
 // main
